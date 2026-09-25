@@ -1,0 +1,97 @@
+task_id,tier,method,train_solved,test_solved,program_length,nodes_expanded,time_ms,program
+easy_01,easy,BFS,True,True,1,1,0.089,rotate_90
+easy_01,easy,A*,True,True,1,2,0.562,rotate_90
+easy_01,easy,Weighted A* (w=2.0),True,True,1,2,0.513,rotate_90
+easy_01,easy,Q-Learning RL,True,True,1,1,0.717,rotate_90
+easy_02,easy,BFS,True,True,1,1,0.121,flip_h
+easy_02,easy,A*,True,True,1,2,0.532,flip_h
+easy_02,easy,Weighted A* (w=2.0),True,True,1,2,0.54,flip_h
+easy_02,easy,Q-Learning RL,True,True,1,1,0.739,flip_h
+easy_03,easy,BFS,True,True,1,1,0.13,flip_v
+easy_03,easy,A*,True,True,1,2,0.401,flip_v
+easy_03,easy,Weighted A* (w=2.0),True,True,1,2,0.417,flip_v
+easy_03,easy,Q-Learning RL,True,True,1,1,1.051,flip_v
+easy_04,easy,BFS,True,True,1,1,0.249,recolor(1->2)
+easy_04,easy,A*,True,True,1,2,0.574,recolor(1->2)
+easy_04,easy,Weighted A* (w=2.0),True,True,1,2,0.491,recolor(1->2)
+easy_04,easy,Q-Learning RL,True,True,1,1,0.796,recolor(1->2)
+easy_05,easy,BFS,True,True,1,1,0.189,recolor(1->4)
+easy_05,easy,A*,True,True,1,2,0.467,recolor(1->4)
+easy_05,easy,Weighted A* (w=2.0),True,True,1,2,0.544,recolor(1->4)
+easy_05,easy,Q-Learning RL,True,True,1,1,0.779,recolor(1->4)
+easy_06,easy,BFS,True,True,1,1,0.437,crop_to_content
+easy_06,easy,A*,True,True,1,2,0.482,crop_to_content
+easy_06,easy,Weighted A* (w=2.0),True,True,1,2,0.463,crop_to_content
+easy_06,easy,Q-Learning RL,True,True,1,1,0.612,crop_to_content
+easy_07,easy,BFS,True,True,1,1,0.199,recolor(2->0)
+easy_07,easy,A*,True,True,1,2,0.398,recolor(2->0)
+easy_07,easy,Weighted A* (w=2.0),True,True,1,2,0.413,recolor(2->0)
+easy_07,easy,Q-Learning RL,True,True,1,1,0.649,keep_largest_object
+easy_08,easy,BFS,True,True,1,1,0.414,mirror_complete_h
+easy_08,easy,A*,True,True,1,2,0.472,mirror_complete_h
+easy_08,easy,Weighted A* (w=2.0),True,True,1,2,0.475,mirror_complete_h
+easy_08,easy,Q-Learning RL,True,True,1,1,0.62,mirror_complete_h
+med_01,medium,BFS,True,True,1,1,0.128,transpose
+med_01,medium,A*,True,True,1,2,0.502,transpose
+med_01,medium,Weighted A* (w=2.0),True,True,1,2,0.494,transpose
+med_01,medium,Q-Learning RL,True,True,1,1,0.663,transpose
+med_02,medium,BFS,True,True,2,3,0.982,rotate_180 -> recolor(1->3)
+med_02,medium,A*,True,True,2,3,0.849,rotate_180 -> recolor(1->3)
+med_02,medium,Weighted A* (w=2.0),True,True,2,3,0.829,rotate_180 -> recolor(1->3)
+med_02,medium,Q-Learning RL,False,False,0,3,2.133,None
+med_03,medium,BFS,True,True,2,17,9.011,recolor(2->4) -> crop_to_content
+med_03,medium,A*,True,True,2,3,0.853,crop_to_content -> recolor(2->4)
+med_03,medium,Weighted A* (w=2.0),True,True,2,3,0.859,crop_to_content -> recolor(2->4)
+med_03,medium,Q-Learning RL,False,False,0,3,1.669,None
+med_04,medium,BFS,True,True,2,4,1.391,rotate_270 -> recolor(1->3)
+med_04,medium,A*,True,True,2,3,0.844,rotate_270 -> recolor(1->3)
+med_04,medium,Weighted A* (w=2.0),True,True,2,3,1.205,rotate_270 -> recolor(1->3)
+med_04,medium,Q-Learning RL,True,True,2,2,1.498,rotate_270 -> recolor_by_size(3)
+med_05,medium,BFS,True,True,2,2,0.512,rotate_90 -> recolor(2->0)
+med_05,medium,A*,True,True,2,3,0.702,rotate_90 -> recolor(2->0)
+med_05,medium,Weighted A* (w=2.0),True,True,2,3,0.729,rotate_90 -> recolor(2->0)
+med_05,medium,Q-Learning RL,True,True,2,2,1.129,rotate_90 -> recolor(2->0)
+med_06,medium,BFS,True,True,2,5,1.654,flip_h -> recolor(1->2)
+med_06,medium,A*,True,True,2,3,0.787,flip_h -> recolor(1->2)
+med_06,medium,Weighted A* (w=2.0),True,True,2,3,0.779,flip_h -> recolor(1->2)
+med_06,medium,Q-Learning RL,True,False,3,3,1.709,flip_h -> recolor_by_size(3) -> recolor(1->2)
+med_07,medium,BFS,True,True,2,6,2.05,flip_v -> crop_to_content
+med_07,medium,A*,True,True,2,3,0.784,crop_to_content -> flip_v
+med_07,medium,Weighted A* (w=2.0),True,True,2,3,0.826,crop_to_content -> flip_v
+med_07,medium,Q-Learning RL,True,True,2,2,1.164,crop_to_content -> flip_v
+med_08,medium,BFS,True,True,2,4,1.64,rotate_270 -> recolor(2->1)
+med_08,medium,A*,True,True,2,3,1.186,rotate_270 -> recolor(2->1)
+med_08,medium,Weighted A* (w=2.0),True,True,2,3,0.952,rotate_270 -> recolor(2->1)
+med_08,medium,Q-Learning RL,True,False,3,3,1.92,rotate_270 -> recolor_by_size(1) -> recolor(2->1)
+hard_01,hard,BFS,True,True,3,27,8.598,rotate_90 -> recolor(1->3) -> crop_to_content
+hard_01,hard,A*,True,True,3,4,0.99,crop_to_content -> rotate_90 -> recolor(1->3)
+hard_01,hard,Weighted A* (w=2.0),True,True,3,4,0.98,crop_to_content -> rotate_90 -> recolor(1->3)
+hard_01,hard,Q-Learning RL,True,True,3,3,2.396,crop_to_content -> rotate_90 -> recolor(1->3)
+hard_02,hard,BFS,True,True,2,2,0.736,rotate_90 -> recolor(2->0)
+hard_02,hard,A*,True,True,2,3,0.83,rotate_90 -> recolor(2->0)
+hard_02,hard,Weighted A* (w=2.0),True,True,2,3,0.792,rotate_90 -> recolor(2->0)
+hard_02,hard,Q-Learning RL,True,True,2,2,1.196,rotate_90 -> recolor(2->0)
+hard_03,hard,BFS,True,True,3,24,9.284,rotate_90 -> flip_v -> recolor(1->2)
+hard_03,hard,A*,True,True,3,28,5.043,rotate_180 -> transpose -> recolor(1->2)
+hard_03,hard,Weighted A* (w=2.0),True,True,3,59,4.499,rotate_180 -> transpose -> recolor(1->2)
+hard_03,hard,Q-Learning RL,False,False,0,3,1.74,None
+hard_04,hard,BFS,True,True,2,6,2.057,flip_v -> recolor(1->3)
+hard_04,hard,A*,True,True,2,3,0.807,flip_v -> recolor(1->3)
+hard_04,hard,Weighted A* (w=2.0),True,True,2,3,0.894,flip_v -> recolor(1->3)
+hard_04,hard,Q-Learning RL,False,False,0,3,1.922,None
+hard_05,hard,BFS,True,True,3,19,6.354,rotate_90 -> flip_v -> crop_to_content
+hard_05,hard,A*,True,True,3,4,0.942,crop_to_content -> rotate_270 -> flip_h
+hard_05,hard,Weighted A* (w=2.0),True,True,3,4,0.905,crop_to_content -> rotate_270 -> flip_h
+hard_05,hard,Q-Learning RL,False,False,0,3,1.433,None
+hard_06,hard,BFS,True,True,3,37,13.63,rotate_270 -> recolor(1->4) -> recolor(2->0)
+hard_06,hard,A*,True,True,3,4,1.08,rotate_270 -> recolor(1->4) -> recolor(2->0)
+hard_06,hard,Weighted A* (w=2.0),True,True,3,4,1.057,rotate_270 -> recolor(1->4) -> recolor(2->0)
+hard_06,hard,Q-Learning RL,True,True,3,3,1.691,rotate_270 -> recolor(1->4) -> recolor(2->0)
+hard_07,hard,BFS,True,True,3,26,11.366,rotate_90 -> flip_v -> recolor(2->3)
+hard_07,hard,A*,True,True,3,43,4.507,rotate_270 -> flip_h -> recolor(2->3)
+hard_07,hard,Weighted A* (w=2.0),True,True,3,57,4.58,rotate_270 -> flip_h -> recolor(2->3)
+hard_07,hard,Q-Learning RL,False,False,0,3,1.896,None
+hard_08,hard,BFS,True,True,3,35,11.19,rotate_180 -> recolor_by_size(2) -> crop_to_content
+hard_08,hard,A*,True,True,3,4,0.936,crop_to_content -> rotate_180 -> recolor_by_size(2)
+hard_08,hard,Weighted A* (w=2.0),True,True,3,4,0.92,crop_to_content -> rotate_180 -> recolor_by_size(2)
+hard_08,hard,Q-Learning RL,True,True,3,3,1.461,crop_to_content -> rotate_180 -> recolor_by_size(2)

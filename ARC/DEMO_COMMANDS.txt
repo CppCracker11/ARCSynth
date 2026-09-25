@@ -1,0 +1,603 @@
+============================================================
+ARCSYNTH FACULTY DEMO / COMMAND REFERENCE
+============================================================
+Project: ARCSynth - Search-Based Program Synthesis for ARC-AGI
+Environment: Windows PowerShell / Pure Python 3 + NumPy
+Author / Presenter Guide for Faculty Evaluation
+
+
+============================================================
+1. PROJECT OVERVIEW
+============================================================
+
+WHAT IT DOES & CHECKS:
+Lists all files and directories in the ARCSynth repository root to inspect
+project modularity, lightweight dependencies (no neural nets, no heavy
+frameworks), and verification scripts.
+
+COMMAND:
+Get-ChildItem
+
+EXPECTED OUTPUT:
+A PowerShell directory listing showing the complete repository structure:
+- Core modules: objects.py, grids.py, dsl.py
+- Search & learning algorithms: search_bfs.py, search_astar.py, search_weighted.py, rl_agent.py
+- Benchmark & evaluation: benchmark.py, benchmark_tasks.json, evaluate.py, results.csv
+- Demonstration layer: demo.py, DEMO_COMMANDS.txt
+- Full test suite: 9 test_*.py files covering all subsystems
+
+
+------------------------------------------------------------
+COMMAND (Clean File Name List):
+Get-ChildItem -Name
+
+EXPECTED OUTPUT:
+A compact, alphabetical list of all files in the root folder, demonstrating
+a clean, self-contained project with zero external black-box models.
+
+
+============================================================
+2. RUN THE MAIN DEMO
+============================================================
+
+WHAT IT DOES & CHECKS:
+Runs the standalone faculty demonstration layer. Demonstrates the complete
+synthesis pipeline on a non-trivial benchmark task (`hard_01`, tier HARD).
+Shows multi-pair training grids, A* search configuration, the synthesized
+3-primitive program, step-by-step intermediate execution on the held-out test
+input, 100% exact test output verification, nodes expanded, and runtime.
+
+COMMAND:
+python demo.py
+
+EXPECTED OUTPUT:
+A clean, formatted terminal presentation containing:
+1. Project title banner and architectural overview.
+2. Benchmark Task specification (`hard_01`, Tier: HARD).
+3. Training pair grids displayed side-by-side (Input --> Target Output).
+4. Algorithm configuration: A* Search with Hamming + shape mismatch heuristic.
+5. Discovered program: crop_to_content -> rotate_90 -> recolor(1->3).
+6. Held-out test input grid.
+7. Step-by-step execution on test input, showing the grid after each primitive.
+8. Test verification: side-by-side comparison of Predicted vs Ground Truth.
+   Validation Assessment: PASS (100% Exact Match, 0 pixel errors).
+9. Performance Summary Table:
+   - Search Depth: 3
+   - Nodes Expanded: 4
+   - Execution Time: ~1 to 2 ms
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Lists all 24 available benchmark tasks in `benchmark_tasks.json` grouped by
+tier (easy, medium, hard) with their ground truth primitive lengths.
+
+COMMAND:
+python demo.py --list
+
+EXPECTED OUTPUT:
+A structured table showing all 24 task IDs (easy_01 through easy_08,
+med_01 through med_08, hard_01 through hard_08), their difficulty tier,
+number of primitive operations (1, 2, or 3), and ground truth program sequences.
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Runs the demonstration using Breadth-First Search (BFS) on a medium-tier task
+(`med_01`). Proves that the demo supports interchangeable search algorithms.
+
+COMMAND:
+python demo.py --task med_01 --algo bfs
+
+EXPECTED OUTPUT:
+Complete demo output for `med_01` using BFS. Synthesizes the program
+`transpose` in 1 node expansion and verifies exact test generalization.
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Runs the demonstration using Weighted A* (w=2.0) on `hard_01`, showing how
+heuristic weighting provides fast goal-directed synthesis.
+
+COMMAND:
+python demo.py --task hard_01 --algo weighted
+
+EXPECTED OUTPUT:
+Complete demo output for `hard_01` using Weighted A* Search. Synthesizes
+`crop_to_content -> rotate_90 -> recolor(1->3)` in 4 node expansions in ~1.5 ms
+with 100% test pass.
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Runs the demonstration with raw integer digits (0 displayed instead of dots)
+for faculty members who prefer inspecting raw array values.
+
+COMMAND:
+python demo.py --task hard_01 --raw
+
+EXPECTED OUTPUT:
+Same comprehensive synthesis report, but empty background cells are displayed
+as integer `0` instead of `.`.
+
+
+============================================================
+3. GENERATE BENCHMARK
+============================================================
+
+WHAT IT DOES & CHECKS:
+Regenerates the complete synthetic benchmark suite of 24 ARC-like grid
+transformation tasks across three difficulty tiers (8 Easy, 8 Medium, 8 Hard).
+Verifies that every task is created by known compositions of DSL primitives,
+that transformations are non-trivial (no identity operations), and serializes
+them to `benchmark_tasks.json`.
+
+COMMAND:
+python benchmark.py
+
+EXPECTED OUTPUT:
+Generated 24 benchmark tasks saved to benchmark_tasks.json
+
+
+============================================================
+4. RUN FULL EVALUATION
+============================================================
+
+WHAT IT DOES & CHECKS:
+Executes the comprehensive evaluation pipeline across all 24 benchmark tasks
+for all four synthesis methods:
+1. Breadth-First Search (BFS)
+2. A* Search (admissible Hamming pixel distance + shape penalty)
+3. Weighted A* Search (w=2.0)
+4. Tabular Q-Learning (Reinforcement Learning)
+Evaluates training solve rate, held-out test generalization solve rate,
+search nodes expanded, and synthesis runtime in milliseconds.
+Saves detailed task-level records to `results.csv` and prints a summary table.
+
+COMMAND:
+python evaluate.py
+
+EXPECTED OUTPUT:
+1. Pre-training log: "Training Q-Learning agent on easy & medium tasks... Training complete."
+2. 96 detailed rows (24 tasks x 4 algorithms) showing Task ID, Tier, Method,
+   Train Result (OK/FAIL), Test Result (OK/FAIL), Nodes, Time (ms), and Program.
+3. Confirmation: "Saved detailed evaluation results to results.csv"
+4. BENCHMARK SUMMARY table broken down by Tier and Method:
+   - Easy Tier   : All methods achieve 8/8 (100%) train and test solve rates.
+   - Medium Tier : BFS, A*, and Weighted A* achieve 8/8 (100%); RL achieves 6/8 train, 4/8 test.
+   - Hard Tier   : BFS, A*, and Weighted A* achieve 8/8 (100%); A* expands significantly
+                   fewer nodes than BFS (A* average: 11.6 nodes vs BFS average: 22.0 nodes).
+   - Overall     : BFS, A*, Weighted A* achieve 24/24 (100%) test solve rate.
+
+
+============================================================
+5. RUN INDIVIDUAL TEST SUITES
+============================================================
+
+------------------------------------------------------------
+5.1 Test Connected Components & Object Extraction
+WHAT IT CHECKS:
+Validates `objects.py`. Tests 4-connectivity flood-fill connected component
+labeling, color extraction, bounding box calculations, largest object
+detection, and connected object counting.
+
+COMMAND:
+python -m unittest test_objects.py
+
+EXPECTED OUTPUT:
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK
+
+
+------------------------------------------------------------
+5.2 Test Grid Operations, Hashing & Rendering
+WHAT IT CHECKS:
+Validates `grids.py`. Tests fast tuple-and-byte grid hashing for search state
+deduplication, random synthetic grid generation, JSON serialization/deserialization,
+and Matplotlib ARC-palette visualization.
+
+COMMAND:
+python -m unittest test_grids.py
+
+EXPECTED OUTPUT:
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.300s
+
+OK
+
+
+------------------------------------------------------------
+5.3 Test DSL Primitives & Dynamic Action Space
+WHAT IT CHECKS:
+Validates `dsl.py`. Tests all 17 pure grid-to-grid primitives across geometric
+operations (rotate_90, rotate_180, rotate_270, flip_h, flip_v, transpose),
+color operations (recolor, recolor_by_size, invert_colors), spatial operations
+(crop_to_content, translate, tile, mirror_complete_h, mirror_complete_v),
+object operations (keep_largest_object, remove_object, count_objects),
+and dynamic action space filtering from input/output pairs.
+
+COMMAND:
+python -m unittest test_dsl.py
+
+EXPECTED OUTPUT:
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.010s
+
+OK
+
+
+------------------------------------------------------------
+5.4 Test Benchmark Task Generation
+WHAT IT CHECKS:
+Validates `benchmark.py`. Tests the 24 task specifications across the 3 tiers
+(8 easy, 8 medium, 8 hard), validates synthetic generation reproducibility,
+and confirms that all tasks contain non-trivial input-to-output transformations.
+
+COMMAND:
+python -m unittest test_benchmark.py
+
+EXPECTED OUTPUT:
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.030s
+
+OK
+
+
+------------------------------------------------------------
+5.5 Test Breadth-First Search (BFS) Engine
+WHAT IT CHECKS:
+Validates `search_bfs.py`. Tests depth-1 and depth-2 synthesis, visited state
+hash pruning, program replay correctness on test inputs, and depth limit
+termination.
+
+COMMAND:
+python -m unittest test_search_bfs.py
+
+EXPECTED OUTPUT:
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+
+
+------------------------------------------------------------
+5.6 Test A* Search Engine & Admissible Heuristic
+WHAT IT CHECKS:
+Validates `search_astar.py`. Tests Hamming pixel distance calculation,
+shape mismatch penalty heuristic, priority queue expansion ordering,
+optimal program discovery, and immediate goal detection at depth 0.
+
+COMMAND:
+python -m unittest test_search_astar.py
+
+EXPECTED OUTPUT:
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+
+
+------------------------------------------------------------
+5.7 Test Weighted A* Search Engine
+WHAT IT CHECKS:
+Validates `search_weighted.py`. Tests accelerated search under heuristic
+weight w=2.0, state cost tracking, program replay, and immediate goal handling.
+
+COMMAND:
+python -m unittest test_search_weighted.py
+
+EXPECTED OUTPUT:
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.002s
+
+OK
+
+
+------------------------------------------------------------
+5.8 Test Tabular Q-Learning RL Agent
+WHAT IT CHECKS:
+Validates `rl_agent.py`. Tests state feature vector extraction (shape code,
+Hamming distance bucket, object count delta, color difference flag, geometric
+alignment signal, step index), action key extraction, and multi-episode
+Q-table training with reward feedback.
+
+COMMAND:
+python -m unittest test_rl_agent.py
+
+EXPECTED OUTPUT:
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.035s
+
+OK
+
+
+------------------------------------------------------------
+5.9 Test Benchmark Evaluation Orchestration
+WHAT IT CHECKS:
+Validates `evaluate.py`. Tests end-to-end evaluation pipeline execution
+on a temporary benchmark task, verifies CSV export structure, and validates
+presence of all four methods (BFS, A*, Weighted A*, Q-Learning RL).
+
+COMMAND:
+python -m unittest test_evaluate.py
+
+EXPECTED OUTPUT:
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.450s
+
+OK
+
+
+============================================================
+6. RUN ALL TESTS
+============================================================
+
+WHAT IT DOES & CHECKS:
+Executes the entire test suite across the entire project in a single command.
+Validates end-to-end integration and verifies that no regressions exist.
+
+COMMAND:
+python -m unittest discover
+
+EXPECTED OUTPUT:
+...........................
+----------------------------------------------------------------------
+Ran 27 tests in ~1.0s
+
+OK
+(Followed by the single-task evaluation verification output from test_evaluate.py)
+
+
+============================================================
+7. INSPECT RESULTS
+============================================================
+
+WHAT IT DOES & CHECKS:
+Inspects `results.csv` generated by `evaluate.py`. Displays the first 10
+rows formatted as a clean PowerShell table.
+
+COMMAND:
+Import-Csv results.csv | Select-Object -First 10 | Format-Table -AutoSize
+
+EXPECTED OUTPUT:
+task_id tier method              train_solved test_solved program_length nodes_expanded time_ms program
+------- ---- ------              ------------ ----------- -------------- -------------- ------- -------
+easy_01 easy BFS                 True         True        1              1              0.089   rotate_90
+easy_01 easy A*                  True         True        1              2              0.562   rotate_90
+easy_01 easy Weighted A* (w=2.0) True         True        1              2              0.513   rotate_90
+easy_01 easy Q-Learning RL       True         True        1              1              0.717   rotate_90
+easy_02 easy BFS                 True         True        1              1              0.121   flip_h
+easy_02 easy A*                  True         True        1              2              0.532   flip_h
+easy_02 easy Weighted A* (w=2.0) True         True        1              2              0.540   flip_h
+easy_02 easy Q-Learning RL       True         True        1              1              0.739   flip_h
+easy_03 easy BFS                 True         True        1              1              0.130   flip_v
+easy_03 easy A*                  True         True        1              2              0.401   flip_v
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Compares BFS versus A* on the Hard tier tasks to demonstrate the dramatic
+search node reduction achieved by the A* heuristic guide.
+
+COMMAND:
+Import-Csv results.csv | Where-Object { $_.tier -eq 'hard' -and ($_.method -eq 'BFS' -or $_.method -eq 'A*') } | Select-Object task_id, method, nodes_expanded, time_ms, program | Format-Table -AutoSize
+
+EXPECTED OUTPUT:
+A side-by-side row comparison showing:
+- hard_01: BFS expands 27 nodes; A* expands only 4 nodes (85% reduction)
+- hard_05: BFS expands 19 nodes; A* expands only 4 nodes (79% reduction)
+- hard_06: BFS expands 37 nodes; A* expands only 4 nodes (89% reduction)
+- hard_08: BFS expands 35 nodes; A* expands only 4 nodes (89% reduction)
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Displays the first 15 raw CSV lines using standard PowerShell file viewing.
+
+COMMAND:
+Get-Content results.csv -TotalCount 15
+
+EXPECTED OUTPUT:
+Raw CSV text showing the CSV header and initial easy task records.
+
+
+------------------------------------------------------------
+RESULTS CSV COLUMN EXPLANATION:
+1. `task_id`        : Unique identifier of the benchmark task (e.g., easy_01, med_01, hard_01).
+2. `tier`           : Difficulty tier based on primitive composition count (easy=1, medium=2, hard=3).
+3. `method`         : Synthesis method name (BFS, A*, Weighted A* (w=2.0), Q-Learning RL).
+4. `train_solved`   : True if the algorithm discovered a program satisfying all training pairs.
+5. `test_solved`    : True if the discovered program correctly transformed the held-out test input.
+6. `program_length` : Number of DSL primitive operations in the synthesized sequence.
+7. `nodes_expanded` : Count of search states expanded from the queue (or steps taken by RL).
+8. `time_ms`        : Wall-clock synthesis time in milliseconds.
+9. `program`        : Exact sequence of synthesized DSL primitives (e.g. crop_to_content -> rotate_90 -> recolor(1->3)).
+
+
+============================================================
+8. OPTIONAL ALGORITHM-SPECIFIC DEMOS
+============================================================
+
+WHAT IT DOES & CHECKS:
+Runs the built-in standalone demo inside `search_bfs.py` across easy_01,
+med_01, and hard_01. Verifies direct execution of the BFS module.
+
+COMMAND:
+python search_bfs.py
+
+EXPECTED OUTPUT:
+BFS easy_01: solved=True, nodes=1, time=0.44ms, prog=[rotate_90]
+BFS med_01: solved=True, nodes=1, time=0.24ms, prog=[transpose]
+BFS hard_01: solved=True, nodes=27, time=8.60ms, prog=[rotate_90, recolor(1->3), crop_to_content]
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Runs the built-in standalone demo inside `search_astar.py` across easy_01,
+med_01, and hard_01. Verifies direct execution of the A* module.
+
+COMMAND:
+python search_astar.py
+
+EXPECTED OUTPUT:
+A* easy_01: solved=True, nodes=2, time=0.93ms, prog=[rotate_90]
+A* med_01: solved=True, nodes=2, time=0.55ms, prog=[transpose]
+A* hard_01: solved=True, nodes=4, time=1.20ms, prog=[crop_to_content, rotate_90, recolor(1->3)]
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Runs the built-in standalone demo inside `search_weighted.py` across easy_01,
+med_01, and hard_01. Verifies direct execution of Weighted A*.
+
+COMMAND:
+python search_weighted.py
+
+EXPECTED OUTPUT:
+Weighted A* easy_01: solved=True, nodes=2, time=0.86ms, prog=[rotate_90]
+Weighted A* med_01: solved=True, nodes=2, time=0.60ms, prog=[transpose]
+Weighted A* hard_01: solved=True, nodes=4, time=1.19ms, prog=[crop_to_content, rotate_90, recolor(1->3)]
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Runs the built-in standalone demo inside `rl_agent.py`. Pretrains the tabular
+Q-learning agent and tests rollout synthesis across easy_01, med_01, and hard_01.
+
+COMMAND:
+python rl_agent.py
+
+EXPECTED OUTPUT:
+Training Q-Learning agent on easy/medium tasks...
+RL easy_01: solved=True, steps=1, time=0.79ms, prog=[rotate_90]
+RL med_01: solved=True, steps=1, time=0.75ms, prog=[transpose]
+RL hard_01: solved=True, steps=3, time=1.55ms, prog=[crop_to_content, rotate_90, recolor(1->3)]
+
+
+============================================================
+9. CLEANUP
+============================================================
+
+NOTE: Cleanup should be performed ONLY after the final presentation/verification run.
+
+WHAT IT DOES & CHECKS:
+Safely removes Python compiled bytecode cache directories (`__pycache__`)
+using native PowerShell without throwing errors if the directory is missing.
+
+COMMAND:
+if (Test-Path "__pycache__") { Remove-Item -Recurse -Force "__pycache__" }
+
+EXPECTED OUTPUT:
+Silent completion with exit code 0. `__pycache__` is removed.
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+Safely removes any temporary evaluation or test artifact files that might have
+been created during testing (e.g. `tmp_eval_results.csv`, `tmp_test_tasks.json`).
+
+COMMAND:
+if (Test-Path "tmp_eval_results.csv") { Remove-Item -Force "tmp_eval_results.csv" }
+
+EXPECTED OUTPUT:
+Silent completion with exit code 0.
+
+
+------------------------------------------------------------
+WHAT IT DOES & CHECKS:
+One-liner command that safely cleans all temporary files and bytecode in one step.
+
+COMMAND:
+Get-ChildItem -Filter "tmp_*" -ErrorAction SilentlyContinue | Remove-Item -Force; if (Test-Path "__pycache__") { Remove-Item -Recurse -Force "__pycache__" }
+
+EXPECTED OUTPUT:
+Silent completion with exit code 0. Workspace is fully clean.
+
+
+============================================================
+RECOMMENDED FACULTY DEMO ORDER (5-10 MINUTE FLOW)
+============================================================
+
+Follow this exact sequence during a live faculty demonstration:
+
+STEP 1: PROJECT OVERVIEW (1 minute)
+  Command: Get-ChildItem
+  Talking points:
+  - ARCSynth is a pure Python 3 + NumPy program synthesis engine.
+  - Zero neural networks, zero GPU requirements, and zero network calls.
+  - Formulates program synthesis as heuristic search over multi-pair state spaces.
+  - Show modular code organization: objects -> grids -> dsl -> search/rl -> benchmark/evaluate.
+
+STEP 2: RUN THE LIVE DEMO (2 minutes)
+  Command: python demo.py
+  Talking points:
+  - Walk through the terminal output:
+    1. Show the training pairs (Pair 1 and Pair 2) for benchmark task `hard_01`.
+    2. Explain that the search algorithm simultaneously tracks all training pairs.
+    3. Point out the selected algorithm: A* Search with admissible Hamming + shape penalty.
+    4. Highlight the synthesized program: `crop_to_content -> rotate_90 -> recolor(1->3)`.
+    5. Show the step-by-step intermediate grids as the program is replayed on the test input.
+    6. Emphasize that the held-out test output is an EXACT 100% match (zero pixel errors).
+    7. Point out the speed: synthesizes in ~1.5 ms with only 4 nodes expanded!
+
+STEP 3: EXPLAIN THE DSL AND SEARCH STRATEGY (1 minute)
+  Command: python demo.py --list
+  Talking points:
+  - Explain the Domain-Specific Language (DSL) in `dsl.py`: 17 pure primitives.
+  - Action space pruning: actions are dynamically constructed by inspecting training pairs
+    (e.g., only viable recolorings or tile sizes are included), drastically cutting branching factor.
+  - Contrast with exhaustive brute-force: A* uses heuristic guidance to find the goal with
+    minimal expansions.
+
+STEP 4: RUN FULL BENCHMARK EVALUATION (2 minutes)
+  Command: python evaluate.py
+  Talking points:
+  - Evaluates 24 synthetic tasks across 3 tiers (Easy, Medium, Hard) against 4 algorithms:
+    BFS, A*, Weighted A*, and Tabular Q-Learning.
+  - Highlight the summary table at the end of the run:
+    * BFS: 24/24 (100%) test solve rate, average 9.4 nodes.
+    * A*: 24/24 (100%) test solve rate, average 5.5 nodes (expands ~half the nodes of BFS on hard tasks).
+    * Weighted A*: 24/24 (100%) test solve rate, fastest execution time (~1.05 ms).
+    * Q-Learning RL: 16/24 (66.7%) test solve rate in single-pass rollout without a search tree.
+
+STEP 5: SHOW THE ALGORITHM COMPARISON IN RESULTS (1 minute)
+  Command:
+  Import-Csv results.csv | Where-Object { $_.tier -eq 'hard' -and ($_.method -eq 'BFS' -or $_.method -eq 'A*') } | Select-Object task_id, method, nodes_expanded, time_ms, program | Format-Table -AutoSize
+  Talking points:
+  - Point directly to `hard_01`, `hard_06`, and `hard_08`:
+    * `hard_01`: BFS expanded 27 nodes; A* expanded only 4 nodes!
+    * `hard_06`: BFS expanded 37 nodes; A* expanded only 4 nodes!
+    * `hard_08`: BFS expanded 35 nodes; A* expanded only 4 nodes!
+  - This proves the theoretical advantage of heuristic-guided search over uninformed search.
+
+STEP 6: RUN THE COMPLETE TEST SUITE (1 minute)
+  Command: python -m unittest discover
+  Talking points:
+  - 27 unit tests validating every module: object labeling, grid hashing, DSL primitives,
+    benchmark generator, search algorithms, RL agent, and evaluation pipeline.
+  - Runs in ~1 second with 100% pass rate, ensuring high code reliability and reproducibility.
+
+STEP 7: MODULE RESPONSIBILITY SUMMARY (1 minute)
+  Briefly summarize what each major file contributes:
+  - `objects.py`         : 4-connectivity connected-component analysis and object extraction.
+  - `grids.py`           : Grid hashing, ARC palette color maps, synthetic generation, serialization.
+  - `dsl.py`             : 17 pure grid transformation primitives and dynamic action space builder.
+  - `benchmark.py`       : Synthetic benchmark generator creating 24 non-trivial ARC-like tasks.
+  - `search_bfs.py`      : Exhaustive depth-limited search for provably shortest programs.
+  - `search_astar.py`    : Heuristic-guided priority search minimizing node expansions.
+  - `search_weighted.py` : Weighted A* (w=2.0) for accelerated goal discovery.
+  - `rl_agent.py`        : Tabular Q-learning agent for single-pass synthesis via feature vectors.
+  - `evaluate.py`        : Rigorous multi-algorithm evaluation harness generating results.csv.
+  - `demo.py`            : Clean, interactive CLI presentation layer for faculty demonstration.
+============================================================
