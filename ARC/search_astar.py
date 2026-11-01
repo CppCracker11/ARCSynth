@@ -1,28 +1,28 @@
 import heapq
 import time
 import numpy as np
-from grids import grid_hash
-from dsl import build_action_space
+try:  # Package import
+    from .grids import grid_hash
+    from .dsl import build_action_space
+    from .heuristic import pose_and_paint_heuristic
+except ImportError:  # Direct script/test import
+    from grids import grid_hash
+    from dsl import build_action_space
+    from heuristic import pose_and_paint_heuristic
 
 
 def state_hash(state):
     return tuple(grid_hash(g) for g in state)
 
 
-def calc_hamming_distance(g1, g2):
-    if g1.shape != g2.shape:
-        return max(g1.size, g2.size) + 5 * (
-            abs(g1.shape[0] - g2.shape[0]) + abs(g1.shape[1] - g2.shape[1])
-        )
-    return int(np.count_nonzero(g1 != g2))
-
-
 def heuristic(state, targets):
-    return sum(calc_hamming_distance(g, t) for g, t in zip(state, targets))
+    return pose_and_paint_heuristic(state, targets)
 
 
 def is_goal(state, targets):
-    return all(np.array_equal(g, t) for g, t in zip(state, targets))
+    return len(state) == len(targets) and all(
+        np.array_equal(g, t) for g, t in zip(state, targets)
+    )
 
 
 def solve_astar(train_pairs, max_depth=3, max_nodes=50000):
@@ -32,7 +32,7 @@ def solve_astar(train_pairs, max_depth=3, max_nodes=50000):
     targets = tuple(p["output"] for p in train_pairs)
 
     h0 = heuristic(init_state, targets)
-    if h0 == 0:
+    if is_goal(init_state, targets):
         return {
             "solved": True,
             "program": [],
@@ -40,45 +40,51 @@ def solve_astar(train_pairs, max_depth=3, max_nodes=50000):
             "time_taken": time.perf_counter() - st_time,
         }
 
-    # Priority queue: (f, h, depth, uid, state, program)
     uid = 0
     pq = [(h0, h0, 0, uid, init_state, [])]
     cs = {state_hash(init_state): 0}
     nd = 0
 
-    while pq:
-        f, h, d, _, cur_state, prog = heapq.heappop(pq)
+    while pq and nd < max_nodes:
+        _, _, depth, _, cur_state, program = heapq.heappop(pq)
         nd += 1
 
-        if h == 0 and is_goal(cur_state, targets):
+        if is_goal(cur_state, targets):
             return {
                 "solved": True,
-                "program": prog,
+                "program": program,
                 "nodes_expanded": nd,
                 "time_taken": time.perf_counter() - st_time,
             }
 
-        if d >= max_depth or nd > max_nodes:
+        if depth >= max_depth:
             continue
 
-        for act in acts:
+        for action in acts:
             try:
-                nxt_state = tuple(act(g) for g in cur_state)
+                next_state = tuple(action(grid) for grid in cur_state)
             except Exception:
                 continue
 
-            nxt_d = d + 1
-            nxt_h = heuristic(nxt_state, targets)
-            nxt_f = nxt_d + nxt_h
-            nxt_prog = prog + [act]
-
-            sh = state_hash(nxt_state)
-            if sh in cs and cs[sh] <= nxt_d:
+            next_depth = depth + 1
+            signature = state_hash(next_state)
+            if signature in cs and cs[signature] <= next_depth:
                 continue
 
-            cs[sh] = nxt_d
+            cs[signature] = next_depth
+            next_h = heuristic(next_state, targets)
             uid += 1
-            heapq.heappush(pq, (nxt_f, nxt_h, nxt_d, uid, nxt_state, nxt_prog))
+            heapq.heappush(
+                pq,
+                (
+                    next_depth + next_h,
+                    next_h,
+                    next_depth,
+                    uid,
+                    next_state,
+                    program + [action],
+                ),
+            )
 
     return {
         "solved": False,
@@ -86,16 +92,20 @@ def solve_astar(train_pairs, max_depth=3, max_nodes=50000):
         "nodes_expanded": nd,
         "time_taken": time.perf_counter() - st_time,
     }
-    """
-    cs = cost to reach state
-    nd = nodes expanded count
-    sh = state hash signature
-    """
 
 
 if __name__ == "__main__":
-    from grids import load_tasks
+    try:
+        from .grids import load_tasks
+    except ImportError:
+        from grids import load_tasks
+
     tasks = load_tasks("benchmark_tasks.json")
-    for tid in ["easy_01", "med_01", "hard_01"]:
-        res = solve_astar(tasks[tid]["train"])
-        print(f"A* {tid}: solved={res['solved']}, nodes={res['nodes_expanded']}, time={res['time_taken']*1000:.2f}ms, prog={res['program']}")
+    for task_id in ["easy_01", "med_01", "hard_01"]:
+        result = solve_astar(tasks[task_id]["train"])
+        print(
+            f"A* {task_id}: solved={result['solved']}, "
+            f"nodes={result['nodes_expanded']}, "
+            f"time={result['time_taken'] * 1000:.2f}ms, "
+            f"program={result['program']}"
+        )

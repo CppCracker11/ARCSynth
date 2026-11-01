@@ -1,6 +1,6 @@
 # ARCSynth
 
-ARCSynth is a pure Python 3 + NumPy search-based program synthesis engine for ARC-AGI-style grid transformation puzzles. It contains no neural networks, no machine learning frameworks, and makes no network calls. It formulates program synthesis as state-space search: each state holds the current grids for all training pairs simultaneously, actions apply domain-specific primitives across all grids in parallel, and a goal is reached when every grid equals its target. Discovered programs are replayed on held-out test inputs.
+ARCSynth is a Python program-synthesis engine for ARC-style grid transformation puzzles. Its BFS, A*, and Weighted A* search use NumPy; tabular Q-learning is also available, and the optional DQN agent uses PyTorch. It makes no network calls. Each search state holds the current grids for all training pairs simultaneously, actions apply DSL primitives across all grids, and a goal is reached only when every grid exactly equals its target. Discovered programs are replayed on held-out test inputs.
 
 ## Quickstart
 
@@ -43,20 +43,23 @@ Synthesizes a 24-task benchmark suite divided across three difficulty tiers: Eas
 Implements exhaustive depth-limited Breadth-First Search over the shared primitive sequence space. It operates over multi-pair state tuples, maintaining visited state hashes to eliminate duplicate states, guaranteeing discovery of the shortest valid program.
 
 ### 6. `search_astar.py`
-Implements A* search guided by a priority queue ordered by $f(n) = \text{depth}(n) + h(n)$. The heuristic $h(n)$ computes the sum of Hamming pixel differences and shape mismatch penalties between current grids and target grids across all training pairs. A* reduces node expansions on average compared to BFS (particularly as program depth increases, expanding roughly half the nodes of BFS on the hard tier), though on simple depth-1 tasks where BFS checks goals upon state generation, BFS can terminate with fewer or equal expansions.
+Implements A* search guided by $f(n) = \text{depth}(n) + h(n)$. The active Pose-and-Paint heuristic combines shape differences, foreground-position mismatch, color mismatch, object-count differences, foreground-center displacement, and color-count differences across training pairs. It guides the search but is not claimed to be admissible; every candidate is still checked against exact training targets.
 
 ### 7. `search_weighted.py`
-Implements Weighted A* search using $f(n) = \text{depth}(n) + w \cdot h(n)$ with $w = 2.0$. By weighting the heuristic distance, the search prioritizes goal-directed transitions, reducing exploration on deeper branches to trade theoretical optimality for faster execution.
+Implements Weighted A* using $f(n) = \text{depth}(n) + w \cdot h(n)$, with a default weight of $w = 2.0$ and support for caller-supplied weights. It uses the same Pose-and-Paint heuristic as A*; larger weights emphasize heuristic guidance but do not guarantee lower runtime on every task.
 
 ### 8. `rl_agent.py`
-Implements an alternative synthesizer using tabular Q-learning. States are mapped to compact feature vectors capturing shape alignment, Hamming distance buckets, object count differences, color set agreement, and geometric directional signals. The agent learns $Q(s, a)$ from distance-reduction rewards and exact-match terminal bonuses, synthesizing solutions in single-pass rollouts without branching trees.
+Implements an alternative synthesizer using tabular Q-learning. States are mapped to compact feature vectors capturing shape alignment, Pose-and-Paint score buckets, object-count differences, color-set agreement, and geometric alignment. Parameterized actions retain distinct keys so different recoloring choices are learned separately.
 
-### 9. `evaluate.py`
+### 9. `rl_agent_dqn.py`
+Implements an optional Deep Q-Network agent using PyTorch, with state/action features, experience replay, a target network, epsilon-greedy exploration, and checkpoint save/load. It is separate from tabular Q-learning and is not yet integrated into the evaluation pipeline. Install PyTorch to use it.
+
+### 10. `evaluate.py`
 Orchestrates the evaluation pipeline across all 24 benchmark tasks for BFS, A*, Weighted A*, and Q-learning. Tracks training solve rate, test generalization solve rate, search nodes expanded, and elapsed time, exporting results to `results.csv`.
 
 ## Benchmark Results
 
-Evaluation across 24 synthetic, DSL-generated tasks (8 Easy, 8 Medium, 8 Hard):
+Legacy baseline results recorded before the Pose-and-Paint heuristic update. Re-run evaluation before using these numbers to characterize the updated code. Evaluation uses the 24 synthetic, DSL-generated tasks (8 Easy, 8 Medium, 8 Hard):
 
 | Tier | Method | Train Solve | Test Solve | Avg Nodes / Steps | Avg Time (ms) |
 |---|---|---|---|---|---|

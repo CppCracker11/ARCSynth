@@ -12,8 +12,8 @@ Author / Presenter Guide for Faculty Evaluation
 
 WHAT IT DOES & CHECKS:
 Lists all files and directories in the ARCSynth repository root to inspect
-project modularity, lightweight dependencies (no neural nets, no heavy
-frameworks), and verification scripts.
+project modularity and verification scripts. Core search remains lightweight;
+the optional DQN agent uses PyTorch.
 
 COMMAND:
 Get-ChildItem
@@ -21,7 +21,7 @@ Get-ChildItem
 EXPECTED OUTPUT:
 A PowerShell directory listing showing the complete repository structure:
 - Core modules: objects.py, grids.py, dsl.py
-- Search & learning algorithms: search_bfs.py, search_astar.py, search_weighted.py, rl_agent.py
+- Search & learning algorithms: search_bfs.py, search_astar.py, search_weighted.py, rl_agent.py, rl_agent_dqn.py, heuristic.py
 - Benchmark & evaluation: benchmark.py, benchmark_tasks.json, evaluate.py, results.csv
 - Demonstration layer: demo.py, DEMO_COMMANDS.txt
 - Full test suite: 9 test_*.py files covering all subsystems
@@ -55,7 +55,7 @@ A clean, formatted terminal presentation containing:
 1. Project title banner and architectural overview.
 2. Benchmark Task specification (`hard_01`, Tier: HARD).
 3. Training pair grids displayed side-by-side (Input --> Target Output).
-4. Algorithm configuration: A* Search with Hamming + shape mismatch heuristic.
+4. Algorithm configuration: A* Search with the Pose-and-Paint heuristic.
 5. Discovered program: crop_to_content -> rotate_90 -> recolor(1->3).
 6. Held-out test input grid.
 7. Step-by-step execution on test input, showing the grid after each primitive.
@@ -147,7 +147,7 @@ WHAT IT DOES & CHECKS:
 Executes the comprehensive evaluation pipeline across all 24 benchmark tasks
 for all four synthesis methods:
 1. Breadth-First Search (BFS)
-2. A* Search (admissible Hamming pixel distance + shape penalty)
+2. A* Search (Pose-and-Paint heuristic; not assumed admissible)
 3. Weighted A* Search (w=2.0)
 4. Tabular Q-Learning (Reinforcement Learning)
 Evaluates training solve rate, held-out test generalization solve rate,
@@ -268,11 +268,11 @@ OK
 
 
 ------------------------------------------------------------
-5.6 Test A* Search Engine & Admissible Heuristic
+5.6 Test A* Search Engine & Pose-and-Paint Heuristic
 WHAT IT CHECKS:
-Validates `search_astar.py`. Tests Hamming pixel distance calculation,
-shape mismatch penalty heuristic, priority queue expansion ordering,
-optimal program discovery, and immediate goal detection at depth 0.
+Validates `search_astar.py`. Tests Pose-and-Paint heuristic behavior,
+shape mismatch penalty heuristic, priority queue behavior,
+valid program discovery, and immediate goal detection at depth 0.
 
 COMMAND:
 python -m unittest test_search_astar.py
@@ -306,7 +306,7 @@ OK
 5.8 Test Tabular Q-Learning RL Agent
 WHAT IT CHECKS:
 Validates `rl_agent.py`. Tests state feature vector extraction (shape code,
-Hamming distance bucket, object count delta, color difference flag, geometric
+Pose-and-Paint score bucket, object count delta, color difference flag, geometric
 alignment signal, step index), action key extraction, and multi-episode
 Q-table training with reward feedback.
 
@@ -535,7 +535,7 @@ STEP 1: PROJECT OVERVIEW (1 minute)
   Command: Get-ChildItem
   Talking points:
   - ARCSynth is a pure Python 3 + NumPy program synthesis engine.
-  - Zero neural networks, zero GPU requirements, and zero network calls.
+  - Core search requires no neural network; optional DQN needs PyTorch. No network calls are made.
   - Formulates program synthesis as heuristic search over multi-pair state spaces.
   - Show modular code organization: objects -> grids -> dsl -> search/rl -> benchmark/evaluate.
 
@@ -545,7 +545,7 @@ STEP 2: RUN THE LIVE DEMO (2 minutes)
   - Walk through the terminal output:
     1. Show the training pairs (Pair 1 and Pair 2) for benchmark task `hard_01`.
     2. Explain that the search algorithm simultaneously tracks all training pairs.
-    3. Point out the selected algorithm: A* Search with admissible Hamming + shape penalty.
+    3. Point out the selected algorithm: A* Search with the Pose-and-Paint heuristic.
     4. Highlight the synthesized program: `crop_to_content -> rotate_90 -> recolor(1->3)`.
     5. Show the step-by-step intermediate grids as the program is replayed on the test input.
     6. Emphasize that the held-out test output is an EXACT 100% match (zero pixel errors).

@@ -1,17 +1,32 @@
 from collections import defaultdict
 import time
 import numpy as np
-from dsl import (
-    build_action_space,
-    rotate_90,
-    rotate_180,
-    rotate_270,
-    flip_h,
-    flip_v,
-    transpose,
-)
-from search_astar import heuristic, is_goal
-from objects import count_objects
+try:  # Package import
+    from .dsl import (
+        build_action_space,
+        rotate_90,
+        rotate_180,
+        rotate_270,
+        flip_h,
+        flip_v,
+        transpose,
+    )
+    from .heuristic import pose_and_paint_heuristic as heuristic
+    from .search_astar import is_goal
+    from .objects import count_objects
+except ImportError:  # Direct script/test import
+    from dsl import (
+        build_action_space,
+        rotate_90,
+        rotate_180,
+        rotate_270,
+        flip_h,
+        flip_v,
+        transpose,
+    )
+    from heuristic import pose_and_paint_heuristic as heuristic
+    from search_astar import is_goal
+    from objects import count_objects
 
 
 GEOM_OPS = [
@@ -35,7 +50,7 @@ def extract_features(state, targets, step):
     else:
         shape_code = 2
 
-    # Hamming distance bucket
+    # Pose-and-Paint score bucket
     h_val = heuristic(state, targets)
     if h_val == 0:
         h_bucket = 0
@@ -74,7 +89,7 @@ def extract_features(state, targets, step):
 
 
 def action_key(act):
-    return act.name.split("(")[0]
+    return str(getattr(act, "name", act))
 
 
 class QLearningAgent:
@@ -210,7 +225,10 @@ class QLearningAgent:
 
 
 if __name__ == "__main__":
-    from grids import load_tasks
+    try:
+        from .grids import load_tasks
+    except ImportError:
+        from grids import load_tasks
     tasks = load_tasks("benchmark_tasks.json")
     train_tasks = {k: v for k, v in tasks.items() if v["tier"] in ["easy", "medium"]}
     agent = QLearningAgent(alpha=0.4, gamma=0.8)

@@ -13,11 +13,18 @@ import sys
 import time
 import numpy as np
 
-from grids import load_tasks
-from search_astar import solve_astar
-from search_bfs import solve_bfs, replay_program
-from search_weighted import solve_weighted_astar
-from rl_agent import QLearningAgent
+try:  # Package import
+    from .grids import load_tasks
+    from .search_astar import solve_astar
+    from .search_bfs import solve_bfs, replay_program
+    from .search_weighted import solve_weighted_astar
+    from .rl_agent import QLearningAgent
+except ImportError:  # Direct script/test import
+    from grids import load_tasks
+    from search_astar import solve_astar
+    from search_bfs import solve_bfs, replay_program
+    from search_weighted import solve_weighted_astar
+    from rl_agent import QLearningAgent
 
 
 def render_grid_lines(grid, raw=False):
@@ -60,7 +67,7 @@ def print_banner():
     print("=" * 80)
     print("Architecture Overview:")
     print("  * Paradigm   : State-space search over Domain-Specific Language (DSL) primitives")
-    print("  * Core Stack : Pure Python 3 + NumPy (Zero neural nets, zero GPU dependencies)")
+    print("  * Core Stack : NumPy search + optional PyTorch DQN agent")
     print("  * Guarantee  : Multi-pair parallel verification with held-out generalization")
     print("=" * 80)
 
@@ -131,8 +138,8 @@ def run_demo(task_id="hard_01", algo_name="astar", tasks_path="benchmark_tasks.j
     if algo_key in ("astar", "a*"):
         algo_label = "A* Search (Heuristic-Guided Priority Queue)"
         print(f"  Algorithm : {algo_label}")
-        print(f"  Heuristic : f(n) = depth(n) + sum(Hamming pixel distance + shape penalty)")
-        print(f"  Strategy  : Finds shortest provably correct program with optimal expansions")
+        print(f"  Heuristic : f(n) = depth(n) + Pose-and-Paint score")
+        print(f"  Strategy  : Prioritizes promising states; accepts only exact training-pair matches")
         res = solve_astar(train_pairs, max_depth=3)
 
     elif algo_key == "bfs":
@@ -144,7 +151,7 @@ def run_demo(task_id="hard_01", algo_name="astar", tasks_path="benchmark_tasks.j
     elif algo_key in ("weighted", "weighted_astar", "wastar"):
         algo_label = "Weighted A* Search (w=2.0)"
         print(f"  Algorithm : {algo_label}")
-        print(f"  Heuristic : f(n) = depth(n) + 2.0 * heuristic(n)")
+        print(f"  Heuristic : f(n) = depth(n) + 2.0 * Pose-and-Paint score")
         print(f"  Strategy  : Accelerated greedy goal approach, trading optimality for speed")
         res = solve_weighted_astar(train_pairs, weight=2.0, max_depth=3)
 

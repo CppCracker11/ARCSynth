@@ -1,23 +1,20 @@
 import unittest
 import numpy as np
-from search_astar import solve_astar, calc_hamming_distance, heuristic
+from search_astar import solve_astar, heuristic
 from search_bfs import replay_program
 from dsl import rotate_180, recolor
 
 
 class TestSearchAStar(unittest.TestCase):
-    def test_hamming_and_heuristic(self):
+    def test_pose_and_paint_heuristic(self):
         g1 = np.array([[1, 2], [3, 4]], dtype=np.int32)
         g2 = np.array([[1, 2], [3, 4]], dtype=np.int32)
         g3 = np.array([[1, 0], [3, 9]], dtype=np.int32)
         g4 = np.array([[1, 2, 3]], dtype=np.int32)
 
-        self.assertEqual(calc_hamming_distance(g1, g2), 0)
-        self.assertEqual(calc_hamming_distance(g1, g3), 2)
-        self.assertGreater(calc_hamming_distance(g1, g4), 0)
-
         self.assertEqual(heuristic((g1,), (g2,)), 0)
-        self.assertEqual(heuristic((g1,), (g3,)), 2)
+        self.assertGreater(heuristic((g1,), (g3,)), 0)
+        self.assertGreater(heuristic((g1,), (g4,)), 0)
 
     def test_solve_astar(self):
         in1 = np.array([[1, 2], [3, 0]], dtype=np.int32)

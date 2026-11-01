@@ -17,8 +17,10 @@ class TestRLAgent(unittest.TestCase):
     def test_action_key(self):
         act1 = Action("rotate_90", rotate_90)
         act2 = Action("recolor(1->2)", lambda g: g)
+        act3 = Action("recolor(1->3)", lambda g: g)
         self.assertEqual(action_key(act1), "rotate_90")
-        self.assertEqual(action_key(act2), "recolor")
+        self.assertEqual(action_key(act2), "recolor(1->2)")
+        self.assertNotEqual(action_key(act2), action_key(act3))
 
     def test_train_and_solve_pipeline(self):
         in1 = np.array([[1, 2], [3, 0]], dtype=np.int32)

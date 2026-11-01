@@ -1,11 +1,18 @@
 import csv
 import time
 import numpy as np
-from grids import load_tasks
-from search_bfs import solve_bfs, replay_program
-from search_astar import solve_astar
-from search_weighted import solve_weighted_astar
-from rl_agent import QLearningAgent
+try:  # Package import
+    from .grids import load_tasks
+    from .search_bfs import solve_bfs, replay_program
+    from .search_astar import solve_astar
+    from .search_weighted import solve_weighted_astar
+    from .rl_agent import QLearningAgent
+except ImportError:  # Direct script/test import
+    from grids import load_tasks
+    from search_bfs import solve_bfs, replay_program
+    from search_astar import solve_astar
+    from search_weighted import solve_weighted_astar
+    from rl_agent import QLearningAgent
 
 
 def evaluate_benchmark(tasks_path="benchmark_tasks.json", csv_out="results.csv"):

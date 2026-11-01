@@ -1,8 +1,12 @@
 from collections import deque
 import time
 import numpy as np
-from grids import grid_hash
-from dsl import build_action_space
+try:  # Package import
+    from .grids import grid_hash
+    from .dsl import build_action_space
+except ImportError:  # Direct script/test import
+    from grids import grid_hash
+    from dsl import build_action_space
 
 
 def state_hash(state):
@@ -80,7 +84,10 @@ def solve_bfs(train_pairs, max_depth=3, max_nodes=50000):
 
 
 if __name__ == "__main__":
-    from grids import load_tasks
+    try:
+        from .grids import load_tasks
+    except ImportError:
+        from grids import load_tasks
     tasks = load_tasks("benchmark_tasks.json")
     for tid in ["easy_01", "med_01", "hard_01"]:
         res = solve_bfs(tasks[tid]["train"])

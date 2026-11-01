@@ -1,20 +1,38 @@
 import numpy as np
-from grids import generate_random_grid, save_tasks
-from dsl import (
-    Action,
-    rotate_90,
-    rotate_180,
-    rotate_270,
-    flip_h,
-    flip_v,
-    recolor,
-    recolor_by_size,
-    crop_to_content,
-    keep_largest_object,
-    mirror_complete_h,
-    mirror_complete_v,
-    build_action_space,
-)
+try:  # Package import
+    from .grids import generate_random_grid, save_tasks
+    from .dsl import (
+        Action,
+        rotate_90,
+        rotate_180,
+        rotate_270,
+        flip_h,
+        flip_v,
+        recolor,
+        recolor_by_size,
+        crop_to_content,
+        keep_largest_object,
+        mirror_complete_h,
+        mirror_complete_v,
+        build_action_space,
+    )
+except ImportError:  # Direct script/test import
+    from grids import generate_random_grid, save_tasks
+    from dsl import (
+        Action,
+        rotate_90,
+        rotate_180,
+        rotate_270,
+        flip_h,
+        flip_v,
+        recolor,
+        recolor_by_size,
+        crop_to_content,
+        keep_largest_object,
+        mirror_complete_h,
+        mirror_complete_v,
+        build_action_space,
+    )
 
 
 def apply_sequence(grid, actions):

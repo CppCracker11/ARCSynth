@@ -1,6 +1,9 @@
 from functools import partial
 import numpy as np
-from objects import find_objects, largest_object, count_objects
+try:  # Package import
+    from .objects import find_objects, largest_object, count_objects
+except ImportError:  # Direct script/test import
+    from objects import find_objects, largest_object, count_objects
 
 
 class Action:
